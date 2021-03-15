@@ -2,6 +2,7 @@ package com.jalasoft.practice5;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Main {
@@ -42,9 +43,31 @@ public class Main {
                 .forEach(System.out::println);
 
         System.out.println("----Select producto from Detalle,Pedido where Pedido.codPedido = Detalle.codPedido and Pedido.codPedido = \"ped1\"----");
-        Stream<Pedido> pedido1 = pedidos.stream().filter(pedido -> pedido.getCodPedido().equals("ped1"));
-        detalles.stream().filter(detalle -> detalle.getCodPedido() == pedido1.map(Pedido::getCodPedido));
+        Pedido ped1 = pedidos // Podía haber sido List<Pedido> en caso de que el código no sea unico.
+                .stream()
+                .filter(pedido -> pedido.getCodPedido().equals("ped1"))
+                .findFirst()
+                .orElse(null);
+
+        detalles
+                .stream()
+                .filter(detalle -> detalle.getCodPedido().equals(ped1 != null ? ped1.getCodPedido() : null))
+                .map(Detalle::getProducto)
+                .forEach(System.out::println);
 
 
+        System.out.println("----Select detalle.producto from Detalle,Producto where Pedido.codPedido == Detalle.codPedido and cantidad > 8-----");
+        Pedido ped3 = pedidos
+                .stream()
+                .filter(pedido -> pedido.getCodPedido().equals("ped3"))
+                .findFirst()
+                .orElse(null);
+
+        detalles
+                .stream()
+                .filter(detalle -> detalle.getCodPedido().equals(ped3 != null ? ped3.getCodPedido() : null))
+                .filter(detalle -> detalle.getCantidad() > 8)
+                .map(Detalle::getProducto)
+                .forEach(System.out::println);
     }
 }
